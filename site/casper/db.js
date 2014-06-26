@@ -2,6 +2,7 @@ var require = patchRequire(require);
 require('mootools');
 
 var parseJSON = function(str) {
+  if (!str.replace(new RegExp('\\s', 'g'), '')) return '';
   try {
     var r = JSON.parse(str);
   } catch (e) {
@@ -10,66 +11,57 @@ var parseJSON = function(str) {
   return r;
 };
 
-module.exports = new Class({
-
+var phpcmd = new Class({
   initialize: function(casper, root) {
     this.casper = casper;
     this.root = root;
   },
+  phpcmd: function(callback, params) {
+    var result = false, done = false;
+    var _params = [this.root + '/cmd.php'];
+    for (var i = 0; i < params.length; i++) _params.push(params[i]);
+    require('child_process').execFile('php', _params, null, function(err, stdout, stderr) {
+      done = true;
+      result = parseJSON(stdout);
+    });
+    this.casper.waitFor(function() {
+      return done;
+    }, function() {
+      callback(result);
+    });
+  }
+});
+
+module.exports = new Class({
+  Extends: phpcmd,
 
   insert: function(onInsert, table, key, items) {
     require('fs').write(this.root + '/site/data/parsed/' + key, JSON.stringify(items));
-    require('child_process').execFile('php', [this.root + '/cmd.php', 'insert', table, key], null, function(err, stdout, stderr) {
-      if (onInsert) onInsert();
-    });
-    this.casper.wait(500);
+    this.phpcmd(onInsert, ['insert', table, key]);
   },
 
   update: function(onUpdate, table, id, k, v) {
-    require('child_process').execFile('php', [this.root + '/cmd.php', 'update', table, id, k, v], null, function(err, stdout, stderr) {
-      if (onUpdate) onUpdate();
-    });
-    this.casper.wait(300);
+    this.phpcmd(onUpdate, ['update', table, id, k, v]);
   },
 
   updateBy: function(onUpdate, table, param, paramV, k, v) {
-    require('child_process').execFile('php', [this.root + '/cmd.php', 'updateBy', table, param, paramV, k, v], null, function(err, stdout, stderr) {
-      if (onUpdate) onUpdate();
-    });
+    this.phpcmd(onUpdate, ['updateBy', table, param, paramV, k, v]);
   },
 
   select: function(onSelect, table, what, conds) {
-    require('child_process').execFile('php', [this.root + '/cmd.php', 'select', table, JSON.stringify(what), JSON.stringify(conds)], null, function(err, stdout, stderr) {
-      if (onSelect) onSelect(parseJSON(stdout));
-    });
-    this.casper.wait(500);
+    this.phpcmd(onSelect, ['select', table, JSON.stringify(what), JSON.stringify(conds)]);
   },
 
   selectExportGroups: function(onSelect, table, what, conds) {
-    require('child_process').execFile('php', [this.root + '/cmd.php', 'selectExportGroups', table, JSON.stringify(what), JSON.stringify(conds)], null, function(err, stdout, stderr) {
-      if (onSelect) onSelect(parseJSON(stdout));
-    });
-    this.casper.wait(500);
+    this.phpcmd(onSelect, ['selectExportGroups', table, JSON.stringify(what), JSON.stringify(conds)]);
   },
 
   selectNotPassedKeywords: function(onSelect, table, what, conds, userId) {
-    var a = [
-      this.root + '/cmd.php', 'selectNotPassedKeywords', table, JSON.stringify(what), JSON.stringify(conds), userId
-    ];
-    require('child_process').execFile('php', a, null, function(err, stdout, stderr) {
-      //console.debug(stdout);
-      if (onSelect) onSelect(parseJSON(stdout));
-    });
-    this.casper.wait(500);
+    this.phpcmd(onSelect, ['selectNotPassedKeywords', table, JSON.stringify(what), JSON.stringify(conds), userId]);
   },
 
   joinSync: function(onComplete, ids, userId) {
-    require('child_process').execFile('php', [
-      this.root + '/cmd.php', 'joinSync', JSON.stringify(ids), userId
-    ], null, function(err, stdout, stderr) {
-      onComplete();
-    });
-    this.casper.wait(1000);
+    this.phpcmd(onComplete, ['joinSync', JSON.stringify(ids), userId]);
   }
 
 });

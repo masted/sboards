@@ -15,7 +15,11 @@ class SboardsCore {
     $users = self::users();
     $result = [];
     $describe = function(array $data, $name, &$result) use ($users) {
-      foreach ($data as $v) {
+      foreach ($data as $k => $v) {
+        if (!isset($users[$v['userId']])) {
+          unset($data[$k]);
+          continue;
+        }
         if (!isset($result[$v['userId']]['title'])) $result[$v['userId']]['title'] = $users[$v['userId']]['title'];
         $result[$v['userId']][$name] = $v['cnt'];
       }

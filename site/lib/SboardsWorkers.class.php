@@ -4,7 +4,7 @@ class SboardsWorkers {
 
   function check() {
     while (1) {
-      //$this->_check('search', SboardsCore::users());
+      $this->_check('search', SboardsCore::users());
       $this->_check('join', SboardsCore::groupsReport());
       sleep(5);
     }

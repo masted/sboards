@@ -56,12 +56,12 @@ module.exports = new Class({
       this.db().select(function(groups) {
         this.log('groups selected', 2);
         //this.casper.wait(1000, function(){
-          if (groups.length) {
-            this.log('saving pre-saved groups (' + groups.length + ')', 2);
-            this.saveGroups(groups);
-          } else {
-            this.scrollAndPreSave(this.saveGroups.bind(this));
-          }
+        if (groups.length) {
+          this.log('saving pre-saved groups (' + groups.length + ')', 2);
+          this.saveGroups(groups);
+        } else {
+          this.scrollAndPreSave(this.saveGroups.bind(this));
+        }
         //}.bind(this));
       }.bind(this), 'vkGroupsSearch', ['*'], {
         addF: {
@@ -142,8 +142,7 @@ module.exports = new Class({
     }
     new (require('linksQueue'))(this.casper, groups, function(item) {
       var m = this.casper.page.content.match(new RegExp('Groups\\.init\\(\\{"group_id":(\\d+)'));
-      if (!m)
-        throw new Error('group id not found on page');
+      if (!m) throw new Error('group id not found on page');
       item.id = m[1];
       this.db().updateBy(function() {
       }, 'vkGroupsSearch', 'name', item.name, 'id', item.id);

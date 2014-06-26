@@ -9,4 +9,3 @@ $d = [$k => $v];
 if ($k == 'requested') $d['dateRequest'] = dbCurTime();
 if ($k == 'passed') $d['datePassed'] = dbCurTime();
 db()->update($table, $id, $d);
-print "$table, $id, [$k => $v]";

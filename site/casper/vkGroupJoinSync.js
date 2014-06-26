@@ -27,6 +27,7 @@ module.exports = new Class({
           }
           return r;
         });
+
         for (var i = 0; i < groups.length; i++) groups[i].userId = this.userId;
         var groupIds = [];
         for (var i = 0; i < groups.length; i++) groupIds.push(groups[i].id);
