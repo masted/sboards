@@ -1,3 +1,3 @@
 <?php
 
-new SboardsWorkerCheck;
+(new SboardsWorkers)->check();

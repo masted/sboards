@@ -10,22 +10,20 @@ module.exports = new Class({
   baseUrl: 'http://vk.com',
   _db: null,
   userId: null,
-  logLevel: 3, // 3 for debug
+  logLevel: 2,
 
   initialize: function(casper) {
     Object.merge(this, require('vkParserArgs'));
-    //casper.options.timeout = 60000;
-    casper.options.stepTimeout = 30000;
+    casper.options.stepTimeout = 15000;
     casper.options.pageSettings = {
-      loadImages: false
+      loadImages:  false
     };
     this.casper = casper;
     this.log('start', 2);
     this.casper.start();
   },
 
-  onStepTimeout: function() {
-  },
+  onStepTimeout: function() {},
 
   db: function() {
     if (this._db !== null) return this._db;
@@ -34,6 +32,10 @@ module.exports = new Class({
   },
 
   auth: function(onAuth) {
+    if (this.authorized) {
+      onAuth();
+      return;
+    }
     var dir = require('system').args[3].replace(new RegExp('(.*)/[^/]+/[^/]+'), '$1');
     var users = eval(require('fs').read(dir + '/data/users.json'));
     users = users.filter(function(user) {
@@ -59,23 +61,15 @@ module.exports = new Class({
       }
       this.log(text, 1);
     });
-    this.log('start', 1);
     casper.start(this.baseUrl + '/login?act=mobile');
-    //this.capture();
     casper.then(function() {
-    //casper.wait(1000, function() {
-      this.capture();
-      this.log('evaluate', 1);
       casper.evaluate(function(email, pass) {
         document.getElementById('quick_email').value = email;
         document.getElementById('quick_pass').value = pass;
       }, opts.email, opts.pass);
     });
-    //});
     casper.then(function() {
       casper.click('#quick_login_button');
-      this.capture();
-      this.log('wait For Selector body', 1);
       this.waitForSelector('body', function() {
         this.log('1st page loaded: ' + casper.page.url, 2);
         var code = casper.evaluate(function() {

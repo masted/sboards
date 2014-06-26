@@ -26,7 +26,7 @@ module.exports = new Class({
     this.thenOpen('http://vk.com/' + name, function() {
       console.log('http://vk.com/' + name);
       this.casper.wait(1, function() {
-        // this.scrollTillBottom(function() {
+        //this.scrollTillBottom(function() {
           var links = this.casper.evaluate(function() {
             var elements = __utils__.findAll('a.blst_title'); // find topic links
             var r = [];

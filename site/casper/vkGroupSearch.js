@@ -18,6 +18,7 @@ module.exports = new Class({
   keyword: null,
   initKeyword: function(onInit) {
     this.selectKeyword(function() {
+      this.log('keyword selected callback', 1);
       if (this.keyword.userId == 0) {
         this.assignKeyword(onInit);
       } else {
@@ -26,6 +27,7 @@ module.exports = new Class({
     }.bind(this));
   },
   selectKeyword: function(callback) {
+    this.log('selecting not passed keywords', 2);
     this.db().selectNotPassedKeywords(function(keywords) {
       this.keyword = keywords[0];
       this.log('keyword selected: ' + this.keyword.keyword, 1);
@@ -50,15 +52,17 @@ module.exports = new Class({
   // groups parse & pre-save
   startParse: function() {
     this.auth(function() {
+      this.log('selecting groups', 2);
       this.db().select(function(groups) {
-        this.casper.wait(1000, function(){
+        this.log('groups selected', 2);
+        //this.casper.wait(1000, function(){
           if (groups.length) {
             this.log('saving pre-saved groups (' + groups.length + ')', 2);
             this.saveGroups(groups);
           } else {
             this.scrollAndPreSave(this.saveGroups.bind(this));
           }
-        }.bind(this));
+        //}.bind(this));
       }.bind(this), 'vkGroupsSearch', ['*'], {
         addF: {
           keyword: this.keyword.keyword

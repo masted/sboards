@@ -1,6 +1,15 @@
 var require = patchRequire(require);
 require('mootools');
 
+var parseJSON = function(str) {
+  try {
+    var r = JSON.parse(str);
+  } catch (e) {
+    throw new Error(e.message + "\n" + str);
+  }
+  return r;
+};
+
 module.exports = new Class({
 
   initialize: function(casper, root) {
@@ -31,25 +40,27 @@ module.exports = new Class({
 
   select: function(onSelect, table, what, conds) {
     require('child_process').execFile('php', [this.root + '/cmd.php', 'select', table, JSON.stringify(what), JSON.stringify(conds)], null, function(err, stdout, stderr) {
-      if (onSelect) onSelect(JSON.parse(stdout));
+      if (onSelect) onSelect(parseJSON(stdout));
     });
     this.casper.wait(500);
   },
 
   selectExportGroups: function(onSelect, table, what, conds) {
     require('child_process').execFile('php', [this.root + '/cmd.php', 'selectExportGroups', table, JSON.stringify(what), JSON.stringify(conds)], null, function(err, stdout, stderr) {
-      if (onSelect) onSelect(JSON.parse(stdout));
+      if (onSelect) onSelect(parseJSON(stdout));
     });
     this.casper.wait(500);
   },
 
   selectNotPassedKeywords: function(onSelect, table, what, conds, userId) {
-    require('child_process').execFile('php', [
+    var a = [
       this.root + '/cmd.php', 'selectNotPassedKeywords', table, JSON.stringify(what), JSON.stringify(conds), userId
-    ], null, function(err, stdout, stderr) {
-      if (onSelect) onSelect(JSON.parse(stdout));
+    ];
+    require('child_process').execFile('php', a, null, function(err, stdout, stderr) {
+      //console.debug(stdout);
+      if (onSelect) onSelect(parseJSON(stdout));
     });
-    this.casper.wait(100);
+    this.casper.wait(500);
   },
 
   joinSync: function(onComplete, ids, userId) {
