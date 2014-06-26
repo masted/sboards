@@ -22,7 +22,7 @@ module.exports = new Class({
   },
 
   capture: function(top) {
-    return;
+    //return;
     this.casper.capture('/home/user/ngn-env/rumax/web/captures/1.png', {
       top: 0,
       left: 0,

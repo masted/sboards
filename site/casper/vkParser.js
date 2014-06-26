@@ -15,7 +15,7 @@ module.exports = new Class({
   initialize: function(casper) {
     Object.merge(this, require('vkParserArgs'));
     casper.options.stepTimeout = 15000;
-    casper.options.waitTimeout = 15000;
+    casper.options.waitTimeout = 30000;
     casper.options.pageSettings = {
       loadImages:  false
     };
@@ -124,7 +124,7 @@ module.exports = new Class({
         return document.body.scrollHeight;
       });
       ths.casper.evaluate(function() {
-        window.document.body.scrollTop = document.body.scrollHeight; // скролим
+        document.body.scrollTop = document.body.scrollHeight; // скролим
       });
       ths.casper.wait(1500, function() {                             // ждём
         var heightAfter2sec = ths.casper.evaluate(function() {

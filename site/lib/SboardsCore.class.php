@@ -2,17 +2,19 @@
 
 class SboardsCore {
 
-  static function users() {
+  static function users($all = false) {
     $users = Misc::checkEmpty(json_decode(str_replace("\n", "", file_get_contents(DATA_PATH.'/users.json')), true));
     $users = Arr::assoc($users, 'id');
-    $users = array_filter($users, function($v) {
-      return !empty($v['active']);
-    });
+    if (!$all) {
+      $users = array_filter($users, function($v) {
+        return !empty($v['active']);
+      });
+    }
     return $users;
   }
 
-  static function groupsReport() {
-    $users = self::users();
+  static function groupsReport($all = false) {
+    $users = self::users($all);
     $result = [];
     $describe = function(array $data, $name, &$result) use ($users) {
       foreach ($data as $k => $v) {

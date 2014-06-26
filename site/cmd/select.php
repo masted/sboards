@@ -5,7 +5,6 @@ $what = json_decode($_SERVER['argv'][3]);
 $what = is_array($what) ? implode(', ', $what) : $what;
 $conds = json_decode($_SERVER['argv'][4], true);
 $cond = new DbCond();
-$cond->addRangeFilter('id', 20000);
 foreach ($conds as $method => $param) {
   if (is_array($param)) {
     foreach ($param as $k => $v) {

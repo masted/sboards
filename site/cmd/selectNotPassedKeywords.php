@@ -11,7 +11,6 @@ $_SERVER['argv'] = array (
 );
 */
 
-LogWriter::str('cmd', implode(' ', $_SERVER['argv']));
 $table = $_SERVER['argv'][2];
 $what = json_decode($_SERVER['argv'][3]);
 $conds = json_decode($_SERVER['argv'][4], true);
@@ -24,10 +23,7 @@ foreach ($conds as $method => $param) {
     call_user_func_array([$cond, $method], [$param]);
   }
 }
-//LogWriter::str('keyword', 'conds');
 $r = db()->select('SELECT '.implode(', ', $what).' FROM '.$table.$cond->all());
-//LogWriter::str('keyword', 'selected');
-//db()->query("UPDATE $table SET userId=?d WHERE id IN (?a)", $userId, Arr::get($r, 'id'));
+db()->query("UPDATE $table SET userId=?d WHERE id IN (?a)", $userId, Arr::get($r, 'id'));
 $r = json_encode($r);
-//LogWriter::str('keyword', $r);
 print $r;
