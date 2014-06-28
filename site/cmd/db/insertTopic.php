@@ -6,3 +6,4 @@ foreach ($items as $v) {
   if (isset($v['title'])) $v['title'] = strip_tags($v['title']);
   db()->insert($_SERVER['argv'][2], $v, Db::modeInsertIgnore);
 }
+if (!empty($items)) db()->update('vkGroups', $items[0]['id1'], ['dateExport' => dbCurTime()]);

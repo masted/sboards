@@ -19,6 +19,7 @@ var phpcmd = new Class({
   phpcmd: function(callback, params) {
     var result = false, done = false;
     var _params = [this.root + '/cmd.php'];
+    params[0] = 'db/' + params[0];
     for (var i = 0; i < params.length; i++) _params.push(params[i]);
     require('child_process').execFile('php', _params, null, function(err, stdout, stderr) {
       done = true;
@@ -38,6 +39,11 @@ module.exports = new Class({
   insert: function(onInsert, table, key, items) {
     require('fs').write(this.root + '/site/data/parsed/' + key, JSON.stringify(items));
     this.phpcmd(onInsert, ['insert', table, key]);
+  },
+
+  insertTopics: function(onInsert, table, key, items) {
+    require('fs').write(this.root + '/site/data/parsed/' + key, JSON.stringify(items));
+    this.phpcmd(onInsert, ['insertTopic', table, key]);
   },
 
   update: function(onUpdate, table, id, k, v) {

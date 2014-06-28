@@ -1,0 +1,1 @@
+<? $this->tpl('board/topics', $d['topics']) ?>
