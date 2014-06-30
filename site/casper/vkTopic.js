@@ -33,17 +33,32 @@ var parseDate = function(d) {
     ddd = d[1][3] + '-' + d[1][2] + '-' + d[1][1] + time;
   }
   return ddd;
-}
-
+};
 
 module.exports = new Class({
   Extends: vkParser,
+  topicsLimit: 0,
+  commentsScrollLimit: 100,
+  disableRecursion: false,
   group: null,
   run: function() {
     this.auth(this.startExport.bind(this));
   },
+
   startExport: function() {
+    /*
+    // for debug
+    this.group = {
+      id: 29154907,
+      title: 'DARINA Shopping - Китай, Украина'
+    };
+    this.parseTopic('/topic-29154907_25024971', true);
+   */
     this.db().selectExportGroups(function(groups) {
+      if (!groups.length) {
+        this.log('there are no groups for export', 1);
+        return;
+      }
       this.group = groups[0];
       this.parseGroup();
     }.bind(this), 'vkGroups', '*', {
@@ -52,7 +67,12 @@ module.exports = new Class({
       }
     });
   },
-  exportTopic: function(topic) {
+  nextGroup: function() {
+    if (this.disableRecursion) return;
+    this.log('processing next group', 1);
+    this.startExport();
+  },
+  exportTopic: function(topic, last) {
     for (var i = 0; i < topic.comments.length; i++) {
       topic.comments[i].dateCreate = parseDate(topic.comments[i].dateCreate);
       topic.comments[i].author = topic.comments[i].author[1];
@@ -68,17 +88,19 @@ module.exports = new Class({
     delete topic.comments;
     this.db().insertTopics(function() {
       this.log('topic inserted');
+      if (last) this.nextGroup();
     }.bind(this), 'vkTopics', 'topicExport' + topic.id1 + '_' + topic.id2, [topic]);
     this.db().insert(function() {
       this.log(comments.length + ' comments inserted');
     }.bind(this), 'vkTopicComments', 'commentExport' + topic.id1 + '_' + topic.id2, comments);
   },
   parseGroup: function() {
-    this.parseGroupTopics(this.group, this.exportTopic.bind(this));
+    this.parseGroupTopics(this.group);
   },
-  parseGroupTopics: function(group, onTopic, onComplete) {
-    var name = 'board' + group.id;
-    console.log('parsing group ' + group.name + 'topics');
+  parseGroupTopics: function() {
+    if (!this.group) throw new Error('group is empty');
+    var name = 'board' + this.group.id;
+    console.log('parsing group [' + this.group.title + '] (' + this.group.id + ')');
     this.thenOpen('http://vk.com/' + name, function() {
       this.casper.wait(1, function() {
         var links = this.casper.evaluate(function() {
@@ -89,45 +111,61 @@ module.exports = new Class({
           }
           return r;
         });
-        console.log('found ' + links.length + ' topics');
-        for (var i = 0; i < links.length; i++) {
-          this.parseTopic(group, links[i], i == links.length-1, onTopic, onComplete);
+        if (!links.length) {
+          this.log('there are no links in group [' + this.group.title + ']', 1);
+          this.db().update(function() {
+            this.nextGroup();
+          }.bind(this), 'vkGroups', this.group.id, 'dateExport', new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''));
+          return;
         }
+        var limit = this.topicsLimit || links.length;
+        console.log('found ' + limit + ' topics');
+        for (var i = 0; i < limit; i++) this.parseTopic(links[i], i == limit - 1);
       }.bind(this));
     }.bind(this));
   },
-  parseTopic: function(group, path, last, onComplete, onLast) {
+  parseTopic: function(path, last) {
     var ids = path.match(new RegExp('/topic-(\\d+)_(\\d+)'));
     this.thenOpen('http://vk.com' + path, function() {
       this.casper.wait(100, function() {
         this.log('start scroll');
         this.scrollTillBottom(function() {
           var r = this.casper.evaluate(function() {
-            var authors = __utils__.findAll('.bp_post .bp_author'); // find topic links
-            var comments = __utils__.findAll('.bp_post .bp_text'); // find topic links
-            var dates = __utils__.findAll('.bp_post .bp_date'); // find topic links
-            var title = __utils__.findAll('#wrap3 .bt_header a')[0].innerHTML;
-            var eAuthor = __utils__.findAll('#wrap3 .bt_header .bt_author a')[0];
-            var r = {
-              title: title,
-              author: [eAuthor.getAttribute('href'), eAuthor.innerHTML],
-              comments: []
-            };
-            for (var i = 0; i < authors.length; i++) {
-              r.comments.push({
-                comment: comments[i].innerHTML,
-                author: [authors[i].getAttribute('href'), authors[i].innerHTML],
-                dateCreate: dates[i].innerHTML
-              });
+            try {
+              var authors = __utils__.findAll('.bp_post .bp_author'); // find topic links
+              var comments = __utils__.findAll('.bp_post .bp_text'); // find topic links
+              var dates = __utils__.findAll('.bp_post .bp_date'); // find topic links
+              var title = __utils__.findAll('#wrap3 .bt_header a')[0].innerHTML;
+              var eAuthor = __utils__.findAll('#wrap3 .bt_header .bt_author a');
+              if (eAuthor.length) {
+                eAuthor = eAuthor[0];
+              } else {
+                //return 123;
+                eAuthor = __utils__.findAll('#wrap3 .bt_header .bt_author')[0];
+              }
+              //if (!eAuthor) return false;
+              var r = {
+                title: title,
+                author: [eAuthor.getAttribute('href'), eAuthor.innerHTML],
+                comments: []
+              };
+              for (var i = 0; i < authors.length; i++) {
+                r.comments.push({
+                  comment: comments[i].innerHTML,
+                  author: [authors[i].getAttribute('href'), authors[i].innerHTML],
+                  dateCreate: dates[i].innerHTML
+                });
+              }
+              return r;
+            } catch (e) {
+              return e.message;
             }
-            return r;
           });
           r.id1 = ids[1];
-          if (r.id1 != group.id) throw new Error(r.id1 + ' != ' + group.id);
           r.id2 = ids[2];
-          onComplete(r);
-
-        }.bind(this), 10);
+          if (r.id1 != this.group.id) throw new Error(r.id1 + ' != ' + this.group.id);
+          this.exportTopic(r, last);
+        }.bind(this), this.commentsScrollLimit);
       }.bind(this));
     }.bind(this));
   }

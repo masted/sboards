@@ -29,8 +29,12 @@ class CtrlSboardsDefault extends CtrlCommon {
   function action_topic() {
     $this->d['tpl'] = 'board/topic';
     $this->d['topic'] = db()->selectRow("SELECT * FROM vkTopics WHERE id1=?d AND id2=?d", $this->req->param(1), $this->req->param(2));
-    $this->d['comments'] = db()->query("SELECT * FROM vkTopicComments WHERE id1=?d AND id2=?d ORDER BY dateCreate DESC", $this->req->param(1), $this->req->param(2));
+    $this->d['comments'] = db()->query("SELECT * FROM vkTopicComments WHERE id1=?d AND id2=?d ORDER BY dateCreate", $this->req->param(1), $this->req->param(2));
     $this->setPageTitle($this->d['topic']['title']);
+  }
+
+  function action_away() {
+    $this->redirect($this->req['to']);
   }
 
 }

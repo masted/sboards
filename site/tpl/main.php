@@ -79,7 +79,7 @@
     .lastBlock .items a:hover {
       color: #000;
     }
-    .items a {
+    .items a.title {
       display: block;
     }
     .items .author {
@@ -93,6 +93,9 @@
       font-size: 11px;
       color: #555;
     }
+    .items.groups small {
+      float: none;
+    }
     .groupImage {
       position: absolute;
       top: -95px;
@@ -103,6 +106,12 @@
     }
     .groupImage div {
       padding: 105px 25px 0;
+    }
+    .groupImage a {
+      display: block;
+      width: 100px;
+      height: 100px;
+      background-repeat: no-repeat;
     }
     .groupTitle {
       text-align: right;
@@ -161,7 +170,7 @@
     <div class="groupTitle"><a href="/group/<?= $d['group']['id'] ?>"><?= $d['group']['title'] ?></a></div>
     <? if ($d['group']['img']) { ?>
       <div class="groupImage">
-        <div><a href="/group/<?= $d['group']['id'] ?>"><img src="<?= $d['group']['img'] ?>"/></a></div>
+        <div><a href="/group/<?= $d['group']['id'] ?>" style="background:url(<?= $d['group']['img'] ?>)"></a></div>
       </div>
     <? } ?>
   <? } ?>

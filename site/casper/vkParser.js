@@ -10,7 +10,7 @@ module.exports = new Class({
   baseUrl: 'http://vk.com',
   _db: null,
   userId: null,
-  logLevel: 2,
+  logLevel: 1,
 
   initialize: function(casper) {
     Object.merge(this, require('vkParserArgs'));
