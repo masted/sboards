@@ -8,7 +8,7 @@ $cond = new DbCond();
 $cond->setOrder('id ASC');
 $cond->setLimit(1);
 $cond->addF('joined', 1);
-$cond->addRangeFilter('dateExport', '0000-00-00', dbCurTime(time() - 7 * 60 * 60 * 24)); // только те, что были экспортированы не позже, чем 7 дней незед
+$cond->addRangeFilter('dateExport', '0000-00-00', dbCurTime(SboardsCore::exportTime())); // только те, что были экспортированы не позже, чем 7 дней незед
 foreach ($conds as $method => $param) {
   if (is_array($param)) {
     foreach ($param as $k => $v) {

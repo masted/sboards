@@ -1,21 +1,11 @@
 <?php
 
+$workers = new SboardsWorkers;
 while (1) {
-  $workers = ['search', 'join'];
-  $lines = explode("\n", `ps aux | grep sboards`);
-  $r = [];
-  foreach ($workers as $worker) $r[$worker] = [];
-  foreach ($workers as $worker) {
-    foreach ($lines as $line) {
-      $p = '#'.PROJECT_KEY.'/site/casper/'.$worker.'\\.js (\d+)#';
-      if (preg_match($p, $line, $m)) {
-        $r[$worker][] = $m[1];
-      }
-    }
-  }
+  $r = $workers->getWorking();
   $s = "-------------                     \n".date('i:H:s')."                     \n";
-  $s .= "workers --------------           \nsearch: ".implode(', ', $r['search']).'          '. //
-    "\n".'join:   '.implode(', ', $r['join'])."              \n";
+  $s .= "workers --------------           \n";
+  foreach ($r as $k => $v) $s .= str_pad($k.':', 10).implode(', ', $v)."                     \n";
   Cli::replaceOut($s);
   sleep(5);
 }

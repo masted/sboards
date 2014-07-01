@@ -37,10 +37,12 @@ var parseDate = function(d) {
 
 module.exports = new Class({
   Extends: vkParser,
+
   topicsLimit: 0,
   commentsScrollLimit: 100,
   disableRecursion: false,
   group: null,
+
   run: function() {
     this.auth(this.startExport.bind(this));
   },

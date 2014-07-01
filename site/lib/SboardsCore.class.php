@@ -7,7 +7,7 @@ class SboardsCore {
     $users = Arr::assoc($users, 'id');
     if (!$all) {
       $users = array_filter($users, function($v) {
-        return !empty($v['active']);
+        return isset($v['server']) and $v['server'] == gethostname();
       });
     }
     return $users;
@@ -32,12 +32,18 @@ class SboardsCore {
     $selectAll = function() {
       return db()->select('SELECT userId, COUNT(*) AS cnt FROM vkGroups WHERE private=0 AND userId!=0 GROUP BY userId');
     };
+    $exported = db()->select('SELECT userId, COUNT(*) AS cnt FROM vkGroups WHERE private=0 AND dateExport>? AND userId!=0 GROUP BY userId', dbCurTime(self::exportTime()));
+    $describe($exported, 'exported', $result);
     $describe($select('requested'), 'requested', $result);
     $describe($select('joined'), 'joined', $result);
     $describe($selectAll(), 'all', $result);
     foreach ($result as &$v) if (!isset($v['joined'])) $v['joined'] = 0;
     foreach ($result as &$v) if (!isset($v['requested'])) $v['requested'] = 0;
     return $result;
+  }
+
+  static function exportTime() {
+    return time() - 7 * 60 * 60 * 24;
   }
 
 }
