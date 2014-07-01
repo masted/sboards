@@ -14,8 +14,8 @@ module.exports = new Class({
 
   initialize: function(casper) {
     Object.merge(this, require('vkParserArgs'));
-    casper.options.stepTimeout = 15000;
-    casper.options.waitTimeout = 30000;
+    casper.options.stepTimeout = 60000;
+    casper.options.waitTimeout = 60000;
     casper.options.pageSettings = {
       loadImages:  false
     };
