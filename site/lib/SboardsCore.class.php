@@ -37,6 +37,8 @@ class SboardsCore {
     $describe($select('requested'), 'requested', $result);
     $describe($select('joined'), 'joined', $result);
     $describe($selectAll(), 'all', $result);
+    foreach ($result as $userId => &$v) $v['id'] = $userId;
+    foreach ($result as &$v) if (!isset($v['exported'])) $v['exported'] = 0;
     foreach ($result as &$v) if (!isset($v['joined'])) $v['joined'] = 0;
     foreach ($result as &$v) if (!isset($v['requested'])) $v['requested'] = 0;
     return $result;

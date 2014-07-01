@@ -8,26 +8,33 @@ module.exports = new Class({
     this.auth(function() {
       this.openAndScrollTillBottom('https://vk.com/groups', function() {
         var groups = this.casper.evaluate(function() {
-          var items = __utils__.findAll('.group_list_row');
-          var links = __utils__.findAll('.group_list_row .group_row_labeled a');
-          var images = __utils__.findAll('.group_list_row .group_row_labeled img');
-          var r = [];
-          for (var i = 0; i < items.length; i++) {
-            var name = links[i].getAttribute('href').replace(new RegExp('/([^/]+)'), '$1');
-            var title = links[i].innerHTML.replace(/<\/?[^>]+>/gi, '');
-            var id = items[i].getAttribute('id').replace('gl_groups', '').replace('gl_admin', '');
-            r.push({
-              name: name,
-              title: title,
-              img: '',
-              id: id,
-              joined: 1,
-              requested: 1
-            });
+          try {
+            var items = __utils__.findAll('.group_list_row');
+            var links = __utils__.findAll('.group_list_row .group_row_labeled a');
+            var images = __utils__.findAll('.group_list_row .group_row_labeled img');
+            var r = [];
+            for (var i = 0; i < items.length; i++) {
+              var name = links[i].getAttribute('href').replace(new RegExp('/([^/]+)'), '$1');
+              var title = links[i].innerHTML.replace(/<\/?[^>]+>/gi, '');
+              var id = items[i].getAttribute('id').replace('gl_groups', '').replace('gl_admin', '');
+              r.push({
+                name: name,
+                title: title,
+                img: '',
+                id: id,
+                joined: 1,
+                requested: 1
+              });
+            }
+            return r;
+          } catch (e) {
+            return false;
           }
-          return r;
         });
-
+        if (!groups || !groups.length) {
+          this.log('user ' + this.userId + ' has no groups');
+          return;
+        }
         for (var i = 0; i < groups.length; i++) groups[i].userId = this.userId;
         var groupIds = [];
         for (var i = 0; i < groups.length; i++) groupIds.push(groups[i].id);

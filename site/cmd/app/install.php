@@ -1,3 +1,3 @@
 <?php
 
-die2((new SboardsWorkers)->getActive());
+(new SboardsWorkers)->install();

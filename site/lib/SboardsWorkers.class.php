@@ -8,9 +8,6 @@ class SboardsWorkers {
     if ($name == 'join') {
       return SboardsCore::groupsReport();
     }
-    elseif ($name == 'topic') {
-      return SboardsCore::users(true);
-    }
     else {
       return SboardsCore::users();
     }
