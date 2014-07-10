@@ -1,3 +1,3 @@
 <?php
 
-setConstant('SITE_TITLE', 'Dummy Site');
+setConstant('SITE_TITLE', 'SPECIALBOARDS.ru');

@@ -1,3 +1,1 @@
-new (require('vkTopic'))(require('casper').create({
-  loadImages: false
-})).run();
+new (require('vkTopic'))(require('casper').create()).run();
