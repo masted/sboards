@@ -22,15 +22,16 @@ module.exports = new Class({
   },
 
   capture: function(top) {
-    //return;
-    this.casper.capture('/home/user/ngn-env/rumax/web/captures/1.png', {
+    return;
+    var id = parseInt(Math.random() * 100000000);
+    this.casper.capture('/home/user/ngn-env/rumax/web/captures/' + id + '.png', {
       top: 0,
       left: 0,
       width: 780,
       height: 500
     });
     this.log('CAPTURED', 3);
-    require('child_process').execFile('run', ['rumax/ping'], null, function(err, stdout, stderr) {
+    require('child_process').execFile('run', ['rumax/ping', id], null, function(err, stdout, stderr) {
       this.log('PINGED', 3);
     }.bind(this));
   },

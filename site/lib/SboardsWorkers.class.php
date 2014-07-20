@@ -4,6 +4,17 @@ class SboardsWorkers {
 
   protected $workers = ['search', 'join', 'topic'];
 
+  function __construct() {
+    $enabled = [
+      'search' => (bool)db()->selectCell('SELECT COUNT(*) FROM vkKeywords WHERE userId=0 AND passed=0'),
+      'join' => true,
+      'topic' => true,
+    ];
+    $this->workers = array_filter($this->workers, function($v) use ($enabled) {
+      return $enabled[$v];
+    });
+  }
+
   protected function getUsers($name) {
     if ($name == 'join') {
       return SboardsCore::groupsReport();
@@ -66,6 +77,11 @@ class SboardsWorkers {
     $method = 'checkUser'.ucfirst($name);
     if (method_exists($this, $method)) return $this->$method($user);
     return true;
+  }
+
+  protected function checkUserSearch($user) {
+    //db()->query('SELECT * FROM ');
+    //return $user['requested'] < $user['all'];
   }
 
   protected function checkUserJoin($user) {
