@@ -46,16 +46,15 @@ module.exports = new Class({
   run: function() {
     this.auth(this.startExport.bind(this));
   },
-
   startExport: function() {
     /*
-    // for debug
-    this.group = {
-      id: 29154907,
-      title: 'DARINA Shopping - Китай, Украина'
-    };
-    this.parseTopic('/topic-29154907_25024971', true);
-   */
+     // for debug
+     this.group = {
+     id: 29154907,
+     title: 'DARINA Shopping - Китай, Украина'
+     };
+     this.parseTopic('/topic-29154907_25024971', true);
+     */
     this.db().selectExportGroups(function(groups) {
       if (!groups.length) {
         this.log('there are no groups for export', 1);
@@ -142,10 +141,10 @@ module.exports = new Class({
               if (eAuthor.length) {
                 eAuthor = eAuthor[0];
               } else {
-                //return 123;
+                // return 123;
                 eAuthor = __utils__.findAll('#wrap3 .bt_header .bt_author')[0];
               }
-              //if (!eAuthor) return false;
+              // if (!eAuthor) return false;
               var r = {
                 title: title,
                 author: [eAuthor.getAttribute('href'), eAuthor.innerHTML],
@@ -153,6 +152,7 @@ module.exports = new Class({
               };
               for (var i = 0; i < authors.length; i++) {
                 r.comments.push({
+                  // num:
                   comment: comments[i].innerHTML,
                   author: [authors[i].getAttribute('href'), authors[i].innerHTML],
                   dateCreate: dates[i].innerHTML
