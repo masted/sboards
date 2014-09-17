@@ -126,9 +126,9 @@ module.exports = new Class({
       ths.casper.evaluate(function() {
         document.body.scrollTop = document.body.scrollHeight; // скролим
       });
-      ths.casper.wait(1500, function() {                             // ждём
+      ths.casper.wait(1500, function() {                      // ждём
         var heightAfter2sec = ths.casper.evaluate(function() {
-          return document.body.scrollHeight;                         // смотрим
+          return document.body.scrollHeight;                  // смотрим
         });
         ths.capture();
         ths.log('heightBeforeScroll: ' + heightBeforeScroll + ', heightAfter2sec: ' + heightAfter2sec, 3);
