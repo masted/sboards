@@ -137,7 +137,7 @@ module.exports = new Class({
       });
     };
     /**
-     * @param onComplete clallback function(isLimit)
+     * @param onComplete callback function(isLimit)
      * @param limit
      * @param n
      */
