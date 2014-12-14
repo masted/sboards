@@ -6,25 +6,24 @@ var loglevel = require('loglevel');
 module.exports = new Class({
   Implements: [rumax, loglevel],
 
-  authorized: false,
-  baseUrl: 'http://vk.com',
-  _db: null,
-  userId: null,
-  logLevel: 1,
+  authorized: false, baseUrl: 'http://vk.com', _db: null, userId: null, logLevel: 1,
 
   initialize: function(casper) {
     Object.merge(this, require('vkParserArgs'));
     casper.options.stepTimeout = 60000;
     casper.options.waitTimeout = 60000;
     casper.options.pageSettings = {
-      loadImages:  false
+      loadImages: false,
+      javascriptEnabled: true,
+      userAgent: 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1'
     };
     this.casper = casper;
     this.log('start', 2);
     this.casper.start();
   },
 
-  onStepTimeout: function() {},
+  onStepTimeout: function() {
+  },
 
   db: function() {
     if (this._db !== null) return this._db;
@@ -57,8 +56,8 @@ module.exports = new Class({
       var text = msg + "\n====\n" + trace.length;
       for (var i = 0; i < trace.length; i++) {
         text += trace[i]['file'] + //
-          (trace[i]['function'] ? ' - ' + trace[i]['function'] : '') + ':' + //
-          trace[i]['line'] + "\n";
+        (trace[i]['function'] ? ' - ' + trace[i]['function'] : '') + ':' + //
+        trace[i]['line'] + "\n";
       }
       this.log(text, 1);
     });
@@ -105,19 +104,16 @@ module.exports = new Class({
       }.bind(this));
     }.bind(this));
     casper.run();
-  },
-  onAuth: function(onAuth) {
+  }, onAuth: function(onAuth) {
     this.authorized = true;
     onAuth();
-  },
-  openAndScrollTillBottom: function(url, onComplete, limit) {
+  }, openAndScrollTillBottom: function(url, onComplete, limit) {
     this.thenOpen(url, function() {
       this.casper.wait(1, function() {
         this.scrollTillBottom(onComplete, limit);
       }.bind(this));
     }.bind(this));
-  },
-  scrollTillBottom: function(onComplete, limit) {
+  }, scrollTillBottom: function(onComplete, limit) {
     var ths = this;
     var _scroll = function(onScroll) {
       var heightBeforeScroll = ths.casper.evaluate(function() {
