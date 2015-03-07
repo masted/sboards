@@ -46,7 +46,7 @@ class SboardsWorkers {
   protected function daemonInstaller($name, $userId) {
     return new DaemonInstaller(PROJECT_KEY, "$name-$userId", [
       'bin'  => '/usr/bin/casperjs',
-      'opts' => SITE_PATH."/casper/$name.js $userId"
+      'opts' => PROJECT_PATH."/casper/$name.js $userId"
     ]);
   }
 
@@ -63,7 +63,7 @@ class SboardsWorkers {
     foreach ($users as $userId => $user) {
       $daemon = (new DaemonInstaller(PROJECT_KEY, "$name-$userId", [
         'bin'  => '/usr/bin/casperjs',
-        'opts' => SITE_PATH."/casper/$name.js $userId"
+        'opts' => PROJECT_PATH."/casper/$name.js $userId"
       ]));
       if ($this->checkUser($name, $user)) {
         $s .= "check $daemon->name                ";
