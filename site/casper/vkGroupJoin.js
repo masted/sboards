@@ -1,8 +1,8 @@
 var require = patchRequire(require);
-var vkParser = require('vkParser');
+var vkParserMobile = require('vkParserMobile');
 
 module.exports = new Class({
-  Extends: vkParser,
+  Extends: vkParserMobile,
 
   requesting: [],
   links: [],
@@ -55,9 +55,7 @@ module.exports = new Class({
     this.thenOpen(this.requesting[this.i].url, function(page) {
       this.casper.wait(100, function() {
         var status = this.getGroupStatus();
-        var titles = [
-          'не в группе', 'уже подана заявка', 'уже в группе', 'в черном списке', 'неизвестная хуйня'
-        ];
+        var titles = ['не в группе', 'уже подана заявка', 'уже в группе', 'в черном списке', 'неизвестная хуйня'];
         if (status === 5) {
           this.log(page.url + ' is private', 1);
           this.db().update(function() {

@@ -7,7 +7,7 @@ module.exports = new Class({
   Implements: [rumax, loglevel],
 
   authorized: false,
-  baseUrl: 'http://vk.com',
+  baseUrl: 'http://m.vk.com',
   _db: null,
   userId: null,
   logLevel: 1,
@@ -65,15 +65,28 @@ module.exports = new Class({
       }
       this.log(text, 1);
     });
-    casper.start(this.baseUrl + '/login?act=mobile');
+    //casper.start(this.baseUrl + '/login?act=mobile');
+    casper.start(this.baseUrl);
     casper.then(function() {
-      casper.evaluate(function(email, pass) {
-        document.getElementById('quick_email').value = email;
-        document.getElementById('quick_pass').value = pass;
-      }, opts.email, opts.pass);
+      this.fillSelectors("form", {
+        'input[name=email]': opts.email,
+        'input[name=pass]': opts.pass
+      }, true);
     });
     casper.then(function() {
-      casper.click('#quick_login_button');
+      this.evaluate(function() {
+      });
+      this.capture();
+      if (!casper.exists('form input.button')) {
+        console.debug('NOT FOUND');
+        return;
+      }
+      casper.click('form input.button');
+      this.log('w 2s');
+      casper.wait(2000, function() {
+        this.capture();
+      }.bind(this));
+      return;
       this.waitForSelector('body', function() {
         this.log('1st page loaded: ' + casper.page.url, 2);
         var code = casper.evaluate(function() {
