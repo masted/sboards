@@ -1,6 +1,6 @@
 <?php
 
-class CtrlSboardsDefault extends CtrlCommon {
+class CtrlSboardsDefault extends CtrlDefault {
 
   protected function getParamActionN() {
     return 0;
